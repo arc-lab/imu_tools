@@ -58,8 +58,21 @@ License
 
  * `rviz_imu_plugin`: BSD
 
+Running the package
+-----------------------------------
+[1] rosrun imu_filter_madgwick imu_filter_node _use_mag:=false
+
+[2] remap /dvs/imu:= /imu/data_rae [If using the bag file:= rosbag play -l 2016-08-25-18-04-30.bag /dvs/imu:=/imu/data_raw]
+
+[3] Check the output on RVIZ by adding imu plugin or use rostopic echo /imu/data and check the values under orienation header.
+
+[4] For viewing  the camera output, there is some error in camera frame_id, hence rviz is not able to visualize it, temporarily use = rosrun image_view image_vie image:=/dvs/image_raw
+
+
 References
 -----------------------------------
  [1] http://www.x-io.co.uk/open-source-imu-and-ahrs-algorithms/
 
  [2] http://www.mdpi.com/1424-8220/15/8/19302
+ 
+ 
