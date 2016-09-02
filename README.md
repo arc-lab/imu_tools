@@ -62,7 +62,7 @@ Running the package
 -----------------------------------
 [1] rosrun imu_filter_madgwick imu_filter_node _use_mag:=false
 
-[2] remap /dvs/imu:= /imu/data_rae [If using the bag file:= rosbag play -l 2016-08-25-18-04-30.bag /dvs/imu:=/imu/data_raw]
+[2] remap /dvs/imu:= /imu/data_raw [If using the bag file:= rosbag play -l 2016-08-25-18-04-30.bag /dvs/imu:=/imu/data_raw]
 
 [3] Check the output on RVIZ by adding imu plugin or use rostopic echo /imu/data and check the values under orienation header.
 
