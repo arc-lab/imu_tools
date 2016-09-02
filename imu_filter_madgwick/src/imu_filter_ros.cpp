@@ -37,13 +37,14 @@ ImuFilterRos::ImuFilterRos(ros::NodeHandle nh, ros::NodeHandle nh_private):
   // **** get paramters
 
   if (!nh_private_.getParam ("use_mag", use_mag_))
-   use_mag_ = true;
+   use_mag_ = false;
   if (!nh_private_.getParam ("publish_tf", publish_tf_))
    publish_tf_ = true;
   if (!nh_private_.getParam ("reverse_tf", reverse_tf_))
    reverse_tf_ = false;
   if (!nh_private_.getParam ("fixed_frame", fixed_frame_))
    fixed_frame_ = "odom";
+  ROS_INFO("fixed_frame_ %s",fixed_frame_);
   if (!nh_private_.getParam ("constant_dt", constant_dt_))
     constant_dt_ = 0.0;
   if (!nh_private_.getParam ("publish_debug_topics", publish_debug_topics_))
@@ -82,12 +83,11 @@ ImuFilterRos::ImuFilterRos(ros::NodeHandle nh, ros::NodeHandle nh_private):
   // **** register publishers
   imu_publisher_ = nh_.advertise<sensor_msgs::Imu>(
     ros::names::resolve("imu") + "/data", 5);
-
+  ROS_INFO("imu/data is publisher initialized ");
   if (publish_debug_topics_)
   {
     rpy_filtered_debug_publisher_ = nh_.advertise<geometry_msgs::Vector3Stamped>(
       ros::names::resolve("imu") + "/rpy/filtered", 5);
-
     rpy_raw_debug_publisher_ = nh_.advertise<geometry_msgs::Vector3Stamped>(
       ros::names::resolve("imu") + "/rpy/raw", 5);
   }
@@ -98,9 +98,10 @@ ImuFilterRos::ImuFilterRos(ros::NodeHandle nh, ros::NodeHandle nh_private):
 
   imu_subscriber_.reset(new ImuSubscriber(
     nh_, ros::names::resolve("imu") + "/data_raw", queue_size));
-
+  ROS_INFO("checking use_mag_");
   if (use_mag_)
   {
+    ROS_INFO("imu use_mag_ callback to be registered.. %d",use_mag_);
     if (use_magnetic_field_msg_)
     {
       mag_subscriber_.reset(new MagSubscriber(
@@ -127,6 +128,7 @@ ImuFilterRos::ImuFilterRos(ros::NodeHandle nh, ros::NodeHandle nh_private):
   else
   {
     imu_subscriber_->registerCallback(&ImuFilterRos::imuCallback, this);
+    ROS_INFO("imu non-mag callback registered");
   }
 }
 
@@ -137,6 +139,7 @@ ImuFilterRos::~ImuFilterRos()
 
 void ImuFilterRos::imuCallback(const ImuMsg::ConstPtr& imu_msg_raw)
 {
+  ROS_INFO ("Callback");
   boost::mutex::scoped_lock(mutex_);
 
   const geometry_msgs::Vector3& ang_vel = imu_msg_raw->angular_velocity;
@@ -308,7 +311,7 @@ void ImuFilterRos::publishFilteredMsg(const ImuMsg::ConstPtr& imu_msg_raw)
   imu_msg->orientation_covariance[8] = orientation_variance_;
 
   imu_publisher_.publish(imu_msg);
-
+  ROS_INFO("publish /imu/data");
   if(publish_debug_topics_)
   {
     geometry_msgs::Vector3Stamped rpy;
